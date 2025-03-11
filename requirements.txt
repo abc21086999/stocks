@@ -1,0 +1,3 @@
+twstock
+lxml
+PyQt6
