@@ -1,6 +1,13 @@
 from PyQt6 import QtWidgets, QtCore
 import sys
 
+
+class StockUI(QtWidgets):
+
+    def __init__(self):
+        super().__init__()
+
+
 app = QtWidgets.QApplication(sys.argv)  # 視窗程式開始
 
 Window = QtWidgets.QWidget()              # 建立基底元件
