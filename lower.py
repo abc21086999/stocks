@@ -52,3 +52,5 @@ class StockTable(QWidget):
             if stock_data:
                 self.clean_table_content()
                 self.create_table_content(stock_data)
+        else:
+            self.clean_table_content()

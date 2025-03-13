@@ -41,6 +41,7 @@ class AddStocks(QWidget):
         if stock_id.isnumeric() and stock_id not in self.stock_list:
             self.stock_list.append(stock_id)
             self.setting_manager.save_stock_id(self.stock_list)
+            self.input_line.clear()
         else:
             return None
 
@@ -49,5 +50,6 @@ class AddStocks(QWidget):
         if stock_id.isnumeric() and stock_id in self.stock_list:
             self.stock_list.remove(stock_id)
             self.setting_manager.save_stock_id(self.stock_list)
+            self.input_line.clear()
         else:
             return None

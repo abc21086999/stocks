@@ -13,8 +13,6 @@ class StockUI(QWidget):
         super().__init__()
 
         self.setWindowTitle("Stocks")
-        self.resize(600, 600)
-        # self.setStyleSheet("background:#FFFFF0")
 
         # --- 記憶功能 ---
         self.setting_manager = SettingsManager()
@@ -27,6 +25,7 @@ class StockUI(QWidget):
         self.upper_box.addWidget(self.top_label)
         self.add_stocks = AddStocks(self.setting_manager)
         self.upper_box.addWidget(self.add_stocks)
+
         # 設置Header的對齊位置
         self.upper_box.setAlignment(self.top_label, Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
 
@@ -38,8 +37,6 @@ class StockUI(QWidget):
         self.stock_table = StockTable(self.setting_manager)
         self.stock_table.create_table_header()
         self.lower_box.addWidget(self.stock_table)
-
-        # --- 新增股票 ---
 
         # --- 定時更新股票資訊內容 ---
         self.timer = QTimer()
