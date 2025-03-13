@@ -6,9 +6,6 @@ from PyQt6.QtCore import pyqtSlot
 
 @pyqtSlot()
 def get_stock_data(stock_id_list: list = []):
-    if len(stock_id_list) == 0:
-        print("沒股票要拿資料")
-        return []
     return_list = []
     for id in stock_id_list:
         base_url = "https://tw.stock.yahoo.com"
