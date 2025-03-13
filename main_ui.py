@@ -4,6 +4,7 @@ import sys
 from upper import *
 from lower import *
 from data import *
+from app_settings import *
 
 
 class StockUI(QWidget):
@@ -16,7 +17,8 @@ class StockUI(QWidget):
         # self.setStyleSheet("background:#FFFFF0")
 
         # --- 記憶功能 ---
-        memory = QSettings()
+        self.memory = SettingsManager()
+        self.stock_ids =  self.memory.load_stock_id()
 
         # --- Upper Box ---
         self.upper_box = QVBoxLayout()
@@ -40,6 +42,8 @@ class StockUI(QWidget):
         self.stock_table.create_table_content(get_stock_data())
         self.lower_box.addWidget(self.stock_table)
 
+        # --- 新增股票 ---
+
         # --- 定時更新股票資訊內容 ---
         self.timer = QTimer()
         self.timer.timeout.connect(self.stock_table.update_table_content)
@@ -51,19 +55,6 @@ class StockUI(QWidget):
         self.main_layout.addLayout(self.lower_box)  # 將 lower_frame 加入主佈局
 
         self.setLayout(self.main_layout)  # 設定主視窗的佈局為 main_layout
-
-#
-# label = QtWidgets.QLabel(Window)
-# label.setText("台股")
-# label.setStyleSheet('')
-#
-# add_stock_input = QtWidgets.QLineEdit(Window)
-# add_stock_input.move(100, 100)
-#
-# add_stock_button = QtWidgets.QPushButton(Window)
-# add_stock_button.setText("添加股票")
-# add_stock_button.setStyleSheet("color:black;")
-# add_stock_button.move(200, 100)
 
 
 if __name__ == "__main__":
