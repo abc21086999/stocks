@@ -1,10 +1,13 @@
 from PyQt6.QtWidgets import QGridLayout, QWidget, QLabel
 from data import *
 
-class stockTable(QWidget):
 
-    def __init__(self):
+class StockTable(QWidget):
+
+    def __init__(self, setting_manager):
         super().__init__()
+
+        self.setting_manager = setting_manager
 
         self.stock_table = QGridLayout()
         self.create_table_header()
@@ -19,6 +22,7 @@ class stockTable(QWidget):
             header_label.setText(header)
             self.stock_table.addWidget(header_label, 0, column)
 
+
     def create_table_content(self, stock_resp: list):
         # stock_resp應該是一個包著一個一個list的list
         # ex. [[2330, 台積電, ....]]
@@ -28,6 +32,7 @@ class stockTable(QWidget):
                 data_label.setText(str(data))
                 # 第一行是標頭，所以加在第一行以下
                 self.stock_table.addWidget(data_label, row + 1, column)
+
 
     def clean_table_content(self):
         for row in range(1, self.stock_table.rowCount()):  # 從第 1 行開始迭代 (跳過第 0 行標題列)
@@ -39,8 +44,11 @@ class stockTable(QWidget):
                         widget.deleteLater()  # 刪除 Widget
                         self.stock_table.removeItem(item)  # 從佈局中移除 item (雖然 deleteLater() 也會移除，但為了更明確，可以再次移除)
 
+
     def update_table_content(self):
-        self.clean_table_content()
-        stock_data = get_stock_data()
-        if stock_data:
-            self.create_table_content(stock_data)
+        stored_stock_id = self.setting_manager.load_stock_id()
+        if stored_stock_id:
+            stock_data = get_stock_data(self.setting_manager.load_stock_id())
+            if stock_data:
+                self.clean_table_content()
+                self.create_table_content(stock_data)

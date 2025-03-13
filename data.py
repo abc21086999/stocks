@@ -5,7 +5,10 @@ from PyQt6.QtCore import pyqtSlot
 
 
 @pyqtSlot()
-def get_stock_data(stock_id_list: list = [2330, 3008]):
+def get_stock_data(stock_id_list: list = []):
+    if len(stock_id_list) == 0:
+        print("沒股票要拿資料")
+        return []
     return_list = []
     for id in stock_id_list:
         base_url = "https://tw.stock.yahoo.com"
@@ -54,7 +57,5 @@ def get_stock_data(stock_id_list: list = [2330, 3008]):
         day_low = resp.get("data")[0].get("regularMarketDayLow").get("raw")
         volume = str(int(int(resp.get("data")[0].get("volume")) / 1000))
 
-        return_list.append([symbol_id, symbol_name, latest_price, percentage, day_high, day_low, volume])
+        return_list.append([symbol_id, symbol_name, latest_price, percentage, day_low, day_high, volume])
     return return_list
-
-print(get_stock_data())

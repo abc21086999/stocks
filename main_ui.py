@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
-from PyQt6.QtCore import Qt, QTimer, QSettings
+from PyQt6.QtCore import Qt, QTimer, QSettings, qInstallMessageHandler, QtMsgType
 import sys
 from upper import *
 from lower import *
@@ -17,19 +17,16 @@ class StockUI(QWidget):
         # self.setStyleSheet("background:#FFFFF0")
 
         # --- 記憶功能 ---
-        self.memory = SettingsManager()
-        self.stock_ids =  self.memory.load_stock_id()
+        self.setting_manager = SettingsManager()
 
         # --- Upper Box ---
         self.upper_box = QVBoxLayout()
 
         # --- 添加股票的輸入視窗和點擊按鈕 ---
         self.top_label = create_header()
-        self.add_stock = create_input_area()
-        self.confirm_button = create_add_button()
         self.upper_box.addWidget(self.top_label)
-        self.upper_box.addWidget(self.add_stock)
-        self.upper_box.addWidget(self.confirm_button)
+        self.add_stocks = AddStocks(self.setting_manager)
+        self.upper_box.addWidget(self.add_stocks)
         # 設置Header的對齊位置
         self.upper_box.setAlignment(self.top_label, Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
 
@@ -38,8 +35,8 @@ class StockUI(QWidget):
         self.lower_box = QVBoxLayout()
 
         # --- 顯示股票的table ---
-        self.stock_table = stockTable()
-        self.stock_table.create_table_content(get_stock_data())
+        self.stock_table = StockTable(self.setting_manager)
+        self.stock_table.create_table_header()
         self.lower_box.addWidget(self.stock_table)
 
         # --- 新增股票 ---
@@ -58,6 +55,7 @@ class StockUI(QWidget):
 
 
 if __name__ == "__main__":
+
     app = QApplication(sys.argv)
     window = StockUI()
     window.show()

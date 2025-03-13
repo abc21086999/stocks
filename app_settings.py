@@ -6,10 +6,10 @@ Application = "Stocks"
 class SettingsManager:
 
     def __init__(self):
-        self.settings = QSettings(organization=Organization, application=Application)
+        self.settings = QSettings("StockMuffin", "Stocks")
 
     def save_stock_id(self, stock_id):
         self.settings.setValue("ID", stock_id)
 
-    def load_stock_id(self):
-        self.settings.value("ID", [])
+    def load_stock_id(self) -> list:
+        return self.settings.value("ID", defaultValue=[])
