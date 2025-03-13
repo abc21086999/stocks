@@ -5,7 +5,6 @@ def create_header():
     header = QLabel()
     header.setText("台股")
     header.setStyleSheet("font-size:25px;color:#F0FFFF;")
-
     return header
 
 def create_input_area():

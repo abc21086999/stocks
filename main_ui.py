@@ -1,7 +1,9 @@
-from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout, QFrame
-from PyQt6.QtCore import Qt
+from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
+from PyQt6.QtCore import Qt, QTimer, QSettings
 import sys
 from upper import *
+from lower import *
+from data import *
 
 
 class StockUI(QWidget):
@@ -13,41 +15,40 @@ class StockUI(QWidget):
         self.resize(600, 600)
         # self.setStyleSheet("background:#FFFFF0")
 
-        self.upper_frame = QFrame()  # 創建 QFrame 作為 upper_box 的容器
-        self.upper_frame.setFrameShape(QFrame.Shape.Box)  # 設定邊框形狀為 Box (矩形)
-        self.upper_frame.setFrameShadow(QFrame.Shadow.Plain)  # 設定邊框陰影為 Plain (平面)
-        self.upper_frame.setLineWidth(5)  # 設定邊框線寬 (可選)
-        self.upper_frame.setStyleSheet("border-color: red;")  # 設定邊框顏色 (可選，使用 stylesheet)
+        # --- 記憶功能 ---
+        memory = QSettings()
 
+        # --- Upper Box ---
         self.upper_box = QVBoxLayout()
 
-
+        # --- 添加股票的輸入視窗和點擊按鈕 ---
         self.top_label = create_header()
         self.add_stock = create_input_area()
         self.confirm_button = create_add_button()
         self.upper_box.addWidget(self.top_label)
         self.upper_box.addWidget(self.add_stock)
         self.upper_box.addWidget(self.confirm_button)
-
-        self.upper_frame.setLayout(self.upper_box)
+        # 設置Header的對齊位置
         self.upper_box.setAlignment(self.top_label, Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
 
 
-        # --- Lower Box 及其 Frame ---
-        self.lower_frame = QFrame()  # 創建 QFrame 作為 lower_box 的容器
-        self.lower_frame.setFrameShape(QFrame.Shape.Box)       # 設定邊框形狀為 Box
-        self.lower_frame.setFrameShadow(QFrame.Shadow.Plain)    # 設定邊框陰影為 Plain
-        self.lower_frame.setLineWidth(5)                       # 設定邊框線寬 (可選)
-        self.lower_frame.setStyleSheet("border-color: blue;")  # 設定邊框顏色 (可選，使用 stylesheet)
-
-        # 你可以在 lower_box 裡面也加入一些元件，方便觀察邊框效果
+        # --- Lower Box ---
         self.lower_box = QVBoxLayout()
-        self.lower_frame.setLayout(self.lower_box)  # 將 lower_box 設定為 lower_frame 的佈局
+
+        # --- 顯示股票的table ---
+        self.stock_table = stockTable()
+        self.stock_table.create_table_content(get_stock_data())
+        self.lower_box.addWidget(self.stock_table)
+
+        # --- 定時更新股票資訊內容 ---
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.stock_table.update_table_content)
+        self.timer.start(1000)
 
         # --- Main Layout ---
         self.main_layout = QVBoxLayout()  # 創建主佈局 (垂直排列)
-        self.main_layout.addWidget(self.upper_frame)  # 將 upper_frame 加入主佈局
-        self.main_layout.addWidget(self.lower_frame)  # 將 lower_frame 加入主佈局
+        self.main_layout.addLayout(self.upper_box)  # 將 upper_frame 加入主佈局
+        self.main_layout.addLayout(self.lower_box)  # 將 lower_frame 加入主佈局
 
         self.setLayout(self.main_layout)  # 設定主視窗的佈局為 main_layout
 
