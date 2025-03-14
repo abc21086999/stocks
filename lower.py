@@ -14,7 +14,7 @@ class StockTable(QWidget):
         self.data_signal.connect(self.handle_stock_data)
 
         self.stock_table = QGridLayout()
-        self.headers = ["股票代號", "股票名稱", "現價", "漲跌幅", "盤中最低", "盤中最高", "成交量"]
+        self.headers = ["股票代號", "股票名稱", "現價", "漲跌幅", "盤中最低", "盤中最高", "開盤價", "成交量"]
         self.create_table_header()
         self.stock_data_widgets = {}
         self.stock_order = []
@@ -62,8 +62,12 @@ class StockTable(QWidget):
         else:
             # 如果 stock_id 已在字典中，表示是已存在的股票，只需要更新資料
             for column, header in enumerate(self.headers):
-                if header != "股票代號": # 股票代號不更新
+                if header != "股票代號" and header != "股票名稱": # 股票代號不更新
                     self.stock_data_widgets[stock_id][header].setText(str(stock_data[column]) if column < len(stock_data) else "") # 更新 QLabel 的文字
+            if stock_data[3].strip("%").startswith("-"):
+                self.stock_data_widgets[stock_id]["現價"].setStyleSheet("color:green;")
+            elif float(stock_data[3].strip("%")) > 0:
+                self.stock_data_widgets[stock_id]["現價"].setStyleSheet("color:red;")
 
 
     def update_table_content(self):
