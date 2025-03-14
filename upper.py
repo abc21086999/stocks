@@ -1,6 +1,8 @@
 from PyQt6.QtWidgets import QLabel, QLineEdit, QPushButton, QWidget, QHBoxLayout
 from PyQt6.QtCore import pyqtSlot
 
+import lower
+
 
 def create_header():
     header = QLabel()
@@ -50,6 +52,7 @@ class AddStocks(QWidget):
     def delete_stocks(self):
         stock_id = self.input_line.text().strip()
         if stock_id.isnumeric() and stock_id in self.stock_list:
+            lower.StockTable.delete_signal.emit(stock_id)
             self.stock_list.remove(stock_id)
             self.setting_manager.save_stock_id(self.stock_list)
             self.input_line.clear()
