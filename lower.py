@@ -62,7 +62,7 @@ class StockTable(QWidget):
         else:
             # 如果 stock_id 已在字典中，表示是已存在的股票，只需要更新資料
             for column, header in enumerate(self.headers):
-                if header != "股票代號" and header != "股票名稱": # 股票代號不更新
+                if header != "股票代號" and header != "股票名稱": # 股票代號和名稱不更新
                     self.stock_data_widgets[stock_id][header].setText(str(stock_data[column]) if column < len(stock_data) else "") # 更新 QLabel 的文字
             if stock_data[3].strip("%").startswith("-"):
                 self.stock_data_widgets[stock_id]["現價"].setStyleSheet("color:green;")
