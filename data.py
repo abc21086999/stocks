@@ -14,7 +14,7 @@ class FetchStockData(QRunnable):
         self.data_signal = data_signal
 
     def fetch_data(self):
-        time.sleep(1)
+        time.sleep(0.3)
         try:
             base_url = "https://tw.stock.yahoo.com"
             api_endpoint = "/_td-stock/api/resource/StockServices.stockList"
