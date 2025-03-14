@@ -1,3 +1,5 @@
+import time
+
 from PyQt6.QtCore import pyqtSignal, QObject
 from PyQt6.QtWidgets import QGridLayout, QWidget, QLabel
 from data import *
@@ -59,6 +61,10 @@ class StockTable(QWidget):
                 data_label.setText(str(stock_data[column]) if column < len(stock_data) else "") # 設定文字，避免 indexError
                 self.stock_table.addWidget(data_label, row_index, column) # 將 QLabel 加入表格
                 self.stock_data_widgets[stock_id][header] = data_label # 將 QLabel 存入字典，方便後續更新
+            if stock_data[3].strip("%").startswith("-"):
+                self.stock_data_widgets[stock_id]["現價"].setStyleSheet("color:green;")
+            elif float(stock_data[3].strip("%")) > 0:
+                self.stock_data_widgets[stock_id]["現價"].setStyleSheet("color:red;")
         else:
             # 如果 stock_id 已在字典中，表示是已存在的股票，只需要更新資料
             for column, header in enumerate(self.headers):
