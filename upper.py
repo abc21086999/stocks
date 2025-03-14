@@ -1,10 +1,11 @@
 from PyQt6.QtWidgets import QLabel, QLineEdit, QPushButton, QWidget, QHBoxLayout
+from PyQt6.QtCore import pyqtSlot
 
 
 def create_header():
     header = QLabel()
     header.setText("台股")
-    header.setStyleSheet("font-size:25px;color:#F0FFFF;")
+    header.setStyleSheet("font-size:25px;")
     return header
 
 
@@ -35,7 +36,7 @@ class AddStocks(QWidget):
         # --- 設置布局管理器 ---
         self.setLayout(self.hbox_layout)
 
-
+    @pyqtSlot()
     def add_new_stocks(self):
         stock_id = self.input_line.text().strip()
         if stock_id.isnumeric() and stock_id not in self.stock_list:
@@ -45,6 +46,7 @@ class AddStocks(QWidget):
         else:
             return None
 
+    @pyqtSlot()
     def delete_stocks(self):
         stock_id = self.input_line.text().strip()
         if stock_id.isnumeric() and stock_id in self.stock_list:

@@ -1,9 +1,8 @@
-from PyQt6.QtWidgets import QApplication, QWidget, QLabel, QVBoxLayout
-from PyQt6.QtCore import Qt, QTimer, QSettings, qInstallMessageHandler, QtMsgType
+from PyQt6.QtWidgets import QApplication, QVBoxLayout
+from PyQt6.QtCore import Qt, QTimer, QThreadPool
 import sys
 from upper import *
 from lower import *
-from data import *
 from app_settings import *
 
 
@@ -34,14 +33,15 @@ class StockUI(QWidget):
         self.lower_box = QVBoxLayout()
 
         # --- 顯示股票的table ---
-        self.stock_table = StockTable(self.setting_manager)
-        self.stock_table.create_table_header()
+        self.threadpool = QThreadPool()
+        self.stock_table = StockTable(self.setting_manager, self.threadpool)
+        self.stock_table.update_table_content()
         self.lower_box.addWidget(self.stock_table)
 
         # --- 定時更新股票資訊內容 ---
         self.timer = QTimer()
         self.timer.timeout.connect(self.stock_table.update_table_content)
-        self.timer.start(1000)
+        self.timer.start(3000)
 
         # --- Main Layout ---
         self.main_layout = QVBoxLayout()  # 創建主佈局 (垂直排列)
