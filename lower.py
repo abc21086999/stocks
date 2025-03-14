@@ -7,7 +7,6 @@ from data import *
 
 class StockTable(QWidget):
     data_signal = pyqtSignal(list)
-    delete_signal = pyqtSignal(str)
 
     def __init__(self, setting_manager, thread_pool):
         super().__init__()
@@ -15,7 +14,6 @@ class StockTable(QWidget):
         self.setting_manager = setting_manager
         self.thread_pool = thread_pool
         self.data_signal.connect(self.handle_stock_data)
-        self.delete_signal.connect(self.handle_deleted_stock_data)
 
         self.stock_table = QGridLayout()
         self.headers = ["股票代號", "股票名稱", "現價", "漲跌幅", "盤中最低", "盤中最高", "開盤價", "成交量"]
@@ -78,11 +76,6 @@ class StockTable(QWidget):
                 self.stock_data_widgets[stock_id]["現價"].setStyleSheet("color:red;")
             elif not self.stock_text_color(stock_price):
                 self.stock_data_widgets[stock_id]["現價"].setStyleSheet("color:green;")
-
-    def handle_deleted_stock_data(self, stock_id):
-        if stock_id in self.stock_data_widgets and stock_id in self.stock_order:
-            del self.stock_data_widgets[stock_id]
-            self.stock_order.remove(stock_id)
 
 
     def update_table_content(self):
