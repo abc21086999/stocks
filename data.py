@@ -61,7 +61,6 @@ class FetchStockData(QRunnable):
             day_low = resp.get("data")[0].get("regularMarketDayLow").get("raw")
             volume = str(int(int(resp.get("data")[0].get("volume")) / 1000))
             open_price = resp.get("data")[0].get("regularMarketOpen").get("raw")
-            print(resp)
             return [self.stock_id, symbol_name, latest_price, percentage, day_high, day_low, open_price, volume]
         except:
             return [self.stock_id, self.stock_id, self.stock_id, self.stock_id, self.stock_id, self.stock_id, self.stock_id, self.stock_id]

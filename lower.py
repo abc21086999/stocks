@@ -30,13 +30,13 @@ class StockTable(QWidget):
             header_label.setText(header)
             self.stock_table.addWidget(header_label, 0, column)
 
-    def stock_text_color(self, percentage: str) -> bool | None:
+    def stock_text_color(self, percentage: str) -> str:
         if percentage.strip("%").startswith("-"):
-            return False
+            return "green"
         elif float(percentage.strip("%")) > 0:
-            return True
+            return "red"
         else:
-            return None
+            return "default"
 
     def handle_stock_data(self, stock_data):
         """
@@ -59,23 +59,13 @@ class StockTable(QWidget):
                 data_label.setText(str(stock_data[column]) if column < len(stock_data) else "") # 設定文字，避免 indexError
                 self.stock_table.addWidget(data_label, row_index, column) # 將 QLabel 加入表格
                 self.stock_data_widgets[stock_id][header] = data_label # 將 QLabel 存入字典，方便後續更新
-            if self.stock_text_color(stock_price) is None:
-                pass
-            elif self.stock_text_color(stock_price):
-                self.stock_data_widgets[stock_id]["現價"].setStyleSheet("color:red;")
-            elif not self.stock_text_color(stock_price):
-                self.stock_data_widgets[stock_id]["現價"].setStyleSheet("color:green;")
+            self.stock_data_widgets[stock_id]["現價"].setStyleSheet(f"color:{self.stock_text_color(stock_price)};")
         else:
             # 如果 stock_id 已在字典中，表示是已存在的股票，只需要更新資料
             for column, header in enumerate(self.headers):
                 if header != "股票代號" and header != "股票名稱": # 股票代號和名稱不更新
                     self.stock_data_widgets[stock_id][header].setText(str(stock_data[column]) if column < len(stock_data) else "") # 更新 QLabel 的文字
-            if self.stock_text_color(stock_price) is None:
-                pass
-            elif self.stock_text_color(stock_price):
-                self.stock_data_widgets[stock_id]["現價"].setStyleSheet("color:red;")
-            elif not self.stock_text_color(stock_price):
-                self.stock_data_widgets[stock_id]["現價"].setStyleSheet("color:green;")
+            self.stock_data_widgets[stock_id]["現價"].setStyleSheet(f"color:{self.stock_text_color(stock_price)};")
 
 
     def update_table_content(self):
