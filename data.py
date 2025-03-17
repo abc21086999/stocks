@@ -27,7 +27,7 @@ class FetchStockData(QRunnable):
             }
 
             ampersand_params = {
-                "bkt": '["TW-Stock-Desktop-NewTechCharts-Rampup","t3-tw-fp-trough-galaxy"]',
+                # "bkt": '["TW-Stock-Desktop-NewTechCharts-Rampup","t3-tw-fp-trough-galaxy"]',
                 "device": "desktop",
                 "ecma": "modern",
                 "intl": "tw",
@@ -58,9 +58,10 @@ class FetchStockData(QRunnable):
             latest_price = resp.get("data")[0].get("price").get("raw")
             percentage = resp.get("data")[0].get("changePercent")
             day_high = resp.get("data")[0].get("regularMarketDayHigh").get("raw")
-            day_low = resp.get("data")[0].get("regularMarketOpen").get("raw")
+            day_low = resp.get("data")[0].get("regularMarketDayLow").get("raw")
             volume = str(int(int(resp.get("data")[0].get("volume")) / 1000))
-            open_price = resp.get("data")[0].get("regularMarketDayLow").get("raw")
+            open_price = resp.get("data")[0].get("regularMarketOpen").get("raw")
+            print(resp)
             return [self.stock_id, symbol_name, latest_price, percentage, day_low, day_high, open_price, volume]
         except:
             return [self.stock_id, self.stock_id, self.stock_id, self.stock_id, self.stock_id, self.stock_id, self.stock_id, self.stock_id]
