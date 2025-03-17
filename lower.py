@@ -16,7 +16,7 @@ class StockTable(QWidget):
         self.data_signal.connect(self.handle_stock_data)
 
         self.stock_table = QGridLayout()
-        self.headers = ["股票代號", "股票名稱", "現價", "漲跌幅", "盤中最低", "盤中最高", "開盤價", "成交量"]
+        self.headers = ["股票代號", "股票名稱", "現價", "漲跌幅", "盤中最高", "盤中最低", "開盤價", "成交量"]
         self.create_table_header()
         self.stock_data_widgets = {}
         self.stock_order = []
