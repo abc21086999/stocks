@@ -1,7 +1,5 @@
 from PyQt6.QtWidgets import QLabel, QLineEdit, QPushButton, QWidget, QHBoxLayout
-from PyQt6.QtCore import pyqtSlot
-
-import lower
+from PyQt6.QtCore import pyqtSlot, pyqtSignal
 
 
 def create_header():
@@ -12,6 +10,7 @@ def create_header():
 
 
 class AddStocks(QWidget):
+    stock_deleted = pyqtSignal()
 
     def __init__(self, setting_manager):
         super().__init__()
@@ -55,5 +54,6 @@ class AddStocks(QWidget):
             self.stock_list.remove(stock_id)
             self.setting_manager.save_stock_id(self.stock_list)
             self.input_line.clear()
+            self.stock_deleted.emit()
         else:
             return None

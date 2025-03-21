@@ -8,12 +8,14 @@ from data import *
 class StockTable(QWidget):
     data_signal = pyqtSignal(list)
 
-    def __init__(self, setting_manager, thread_pool):
+    def __init__(self, setting_manager, thread_pool, delete_stock_signal):
         super().__init__()
 
         self.setting_manager = setting_manager
         self.thread_pool = thread_pool
         self.data_signal.connect(self.handle_stock_data)
+        self.stock_delete_signal = delete_stock_signal
+        self.stock_delete_signal.connect(self.on_stock_list_changed)
 
         self.stock_table = QGridLayout()
         self.headers = ["股票代號", "股票名稱", "現價", "漲跌幅", "盤中最高", "盤中最低", "開盤價", "成交量"]
@@ -37,6 +39,19 @@ class StockTable(QWidget):
             return "red"
         else:
             return "default"
+
+    def clean_table_content(self):
+        self.stock_data_widgets = {}
+        self.stock_order = []
+        for row in range(1, self.stock_table.rowCount()):  # 從第 1 行開始迭代 (跳過第 0 行標題列)
+            for column in range(self.stock_table.columnCount()):  # 迭代每一列
+                item = self.stock_table.itemAtPosition(row, column)  # 獲取指定位置的 item
+                if item is not None:  # 確保 item 存在
+                    widget = item.widget()  # 獲取 item 包含的 Widget
+                    if widget is not None:  # 確保 widget 存在
+                        widget.deleteLater()  # 刪除 Widget
+                        self.stock_table.removeItem(item)  # 從佈局中移除 item (雖然 deleteLater() 也會移除，但為了更明確，可以再次移除)
+
 
     def handle_stock_data(self, stock_data):
         """
@@ -74,3 +89,11 @@ class StockTable(QWidget):
         if stored_stock_id:
             for stock_id in stored_stock_id:
                 self.thread_pool.start(FetchStockData(stock_id, self.data_signal))
+
+    @pyqtSlot()
+    def on_stock_list_changed(self):
+        """
+        槽函數，當股票列表變更時被調用，精細化更新表格內容。
+        """
+        self.clean_table_content()
+        self.update_table_content()
