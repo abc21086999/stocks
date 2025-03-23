@@ -1,7 +1,6 @@
-import time
-
+from PyQt6.QtGui import QPalette, QColor
 from PyQt6.QtCore import pyqtSignal, QObject
-from PyQt6.QtWidgets import QGridLayout, QWidget, QLabel
+from PyQt6.QtWidgets import QGridLayout, QWidget, QLabel, QApplication
 from data import *
 
 
@@ -33,12 +32,19 @@ class StockTable(QWidget):
             self.stock_table.addWidget(header_label, 0, column)
 
     def stock_text_color(self, percentage: str) -> str:
-        if percentage.strip("%").startswith("-"):
+        percentage_value = float(percentage.strip("%"))
+        if percentage_value < 0:
             return "green"
-        elif float(percentage.strip("%")) > 0:
+        elif percentage_value > 0:
             return "red"
         else:
-            return "default"
+            # 取得應用程式的調色板 (QPalette)
+            default_palette = QApplication.instance().palette()
+            # 從調色板中取得 "Text" 角色 (Role) 的顏色，這通常是預設文字顏色
+            default_text_color = default_palette.color(QPalette.ColorRole.Text)
+            # 將 QColor 物件轉換成 CSS 樣式表可以接受的顏色字串 (例如: #RRGGBB 格式)
+            default_color_name = default_text_color.name()
+            return default_color_name  # 使用這個顏色名稱作為樣式表的顏色值
 
     def clean_table_content(self):
         self.stock_data_widgets = {}
