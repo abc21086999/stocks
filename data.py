@@ -27,7 +27,6 @@ class FetchStockData(QRunnable):
             }
 
             ampersand_params = {
-                # "bkt": '["TW-Stock-Desktop-NewTechCharts-Rampup","t3-tw-fp-trough-galaxy"]',
                 "device": "desktop",
                 "ecma": "modern",
                 "intl": "tw",
@@ -36,7 +35,6 @@ class FetchStockData(QRunnable):
                 "region": "TW",
                 "site": "finance",
                 "tz": "Asia/Taipei",
-                "ver": "1.4.483",
                 "returnMeta": "true"
             }
 
@@ -52,17 +50,28 @@ class FetchStockData(QRunnable):
             # 組合完整的 URL
             full_url = f"{base_url}{api_endpoint};{semicolon_string}?{ampersand_query_string}"
 
-            resp = requests.get(full_url).json()
-            symbol_id = resp.get("data")[0].get("symbol")
-            symbol_name = resp.get("data")[0].get("symbolName")
-            latest_price = resp.get("data")[0].get("price").get("raw")
-            percentage = resp.get("data")[0].get("changePercent")
-            day_high = resp.get("data")[0].get("regularMarketDayHigh").get("raw")
-            day_low = resp.get("data")[0].get("regularMarketDayLow").get("raw")
-            volume = str(int(int(resp.get("data")[0].get("volume")) / 1000))
-            open_price = resp.get("data")[0].get("regularMarketOpen").get("raw")
+            resp = requests.get(full_url)
+            resp.raise_for_status()
+
+            resp_json = resp.json()
+            # 股票名稱
+            symbol_name = resp_json.get("data")[0].get("symbolName")
+            # 現在價格
+            latest_price = resp_json.get("data")[0].get("price").get("raw")
+            # 漲跌幅
+            percentage = resp_json.get("data")[0].get("changePercent")
+            # 今日最高
+            day_high = resp_json.get("data")[0].get("regularMarketDayHigh").get("raw")
+            # 今日最低
+            day_low = resp_json.get("data")[0].get("regularMarketDayLow").get("raw")
+            # 成交量
+            volume = divmod(int(resp_json.get("data")[0].get("volume")), 1000)[0]
+            # 開盤價格
+            open_price = resp_json.get("data")[0].get("regularMarketOpen").get("raw")
+
             return [self.stock_id, symbol_name, latest_price, percentage, day_high, day_low, open_price, volume]
-        except:
+        except Exception as e:
+            print(f'Exception: {e}')
             return [self.stock_id, self.stock_id, self.stock_id, self.stock_id, self.stock_id, self.stock_id, self.stock_id, self.stock_id]
 
     def run(self):
