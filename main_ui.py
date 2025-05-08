@@ -36,18 +36,12 @@ class StockUI(QWidget):
         # --- 顯示股票的table ---
         self.threadpool = QThreadPool()
         self.stock_table = StockTable(self.setting_manager, self.threadpool, self.add_stocks.stock_deleted)
-        self.stock_table.update_table_content()
         self.lower_box.addWidget(self.stock_table)
 
         # --- 在開盤時更新股票資訊內容 ---
-        today_weekday = datetime.today().weekday()
-        now_hour_min = datetime.now().time()
-        market_open = time(hour=9, minute=0)
-        market_close = time(hour=13, minute=31)
-        if 0 <= today_weekday <= 4 and market_open <= now_hour_min <= market_close:
-            self.timer = QTimer()
-            self.timer.timeout.connect(self.stock_table.update_table_content)
-            self.timer.start(30000)
+        self.timer = QTimer()
+        self.timer.timeout.connect(self.stock_table.decide_update)
+        self.timer.start(30000)
 
         # --- Main Layout ---
         self.main_layout = QVBoxLayout()  # 創建主佈局 (垂直排列)

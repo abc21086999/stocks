@@ -2,6 +2,7 @@ from PyQt6.QtGui import QPalette, QColor
 from PyQt6.QtCore import pyqtSignal, QObject
 from PyQt6.QtWidgets import QGridLayout, QWidget, QLabel, QApplication
 from data import *
+from datetime import datetime, time
 
 
 class StockTable(QWidget):
@@ -23,6 +24,7 @@ class StockTable(QWidget):
         self.stock_order = []
 
         self.setLayout(self.stock_table)
+        self.update_table_content()
 
 
     def create_table_header(self):
@@ -88,6 +90,16 @@ class StockTable(QWidget):
                     self.stock_data_widgets[stock_id][header].setText(str(stock_data[column]) if column < len(stock_data) else "") # 更新 QLabel 的文字
             self.stock_data_widgets[stock_id]["現價"].setStyleSheet(f"color:{self.stock_text_color(stock_price)};")
 
+    def is_market_open(self) -> bool:
+        """
+        如果台股開市就回傳True
+        :return: bool
+        """
+        today_weekday = datetime.today().weekday()
+        now_hour_min = datetime.now().time()
+        market_open = time(hour=9, minute=0)
+        market_close = time(hour=13, minute=31)
+        return 0 <= today_weekday <= 4 and market_open <= now_hour_min <= market_close
 
     def update_table_content(self):
         stored_stock_id = self.setting_manager.load_stock_id()
@@ -96,6 +108,12 @@ class StockTable(QWidget):
             for stock_id in stored_stock_id:
                 self.thread_pool.start(FetchStockData(stock_id, self.data_signal))
 
+    def decide_update(self):
+        if self.is_market_open():
+            self.update_table_content()
+        else:
+            pass
+
     @pyqtSlot()
     def on_stock_list_changed(self):
         """
@@ -103,3 +121,5 @@ class StockTable(QWidget):
         """
         self.clean_table_content()
         self.update_table_content()
+
+
