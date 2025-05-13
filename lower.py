@@ -34,18 +34,25 @@ class StockTable(QWidget):
             self.stock_table.addWidget(header_label, 0, column)
 
     def stock_text_color(self, percentage: str) -> str:
-        percentage_value = float(percentage.strip("%"))
+        # 取得應用程式的調色板 (QPalette)
+        default_palette = QApplication.instance().palette()
+        # 從調色板中取得 "Text" 角色 (Role) 的顏色，這通常是預設文字顏色
+        default_text_color = default_palette.color(QPalette.ColorRole.Text)
+        # 將 QColor 物件轉換成 CSS 樣式表可以接受的顏色字串 (例如: #RRGGBB 格式)
+        default_color_name = default_text_color.name()
+
+        # 如果接收到的字串處理的時候發現無法轉換成小數點，就回傳預設的顏色
+        try:
+            percentage_value = float(percentage.strip("%"))
+        except ValueError:
+            return default_color_name
+
+        # 有轉換成功，進入判斷階段
         if percentage_value < 0:
             return "green"
         elif percentage_value > 0:
             return "red"
         else:
-            # 取得應用程式的調色板 (QPalette)
-            default_palette = QApplication.instance().palette()
-            # 從調色板中取得 "Text" 角色 (Role) 的顏色，這通常是預設文字顏色
-            default_text_color = default_palette.color(QPalette.ColorRole.Text)
-            # 將 QColor 物件轉換成 CSS 樣式表可以接受的顏色字串 (例如: #RRGGBB 格式)
-            default_color_name = default_text_color.name()
             return default_color_name  # 使用這個顏色名稱作為樣式表的顏色值
 
     def clean_table_content(self):

@@ -71,8 +71,8 @@ class FetchStockData(QRunnable):
 
             return [self.stock_id, symbol_name, latest_price, percentage, day_high, day_low, open_price, volume]
         except Exception as e:
-            print(f'Exception: {e}')
-            return [self.stock_id, self.stock_id, self.stock_id, self.stock_id, self.stock_id, self.stock_id, self.stock_id, self.stock_id]
+            # print(f'Exception: {e}')
+            return [self.stock_id, "-", "-", "-", "-", "-", "-", "-", ]
 
     def run(self):
         stock_data_resp = self.fetch_data()
