@@ -105,7 +105,7 @@ class StockTable(QWidget):
         today_weekday = datetime.today().weekday()
         now_hour_min = datetime.now().time()
         market_open = time(hour=9, minute=0)
-        market_close = time(hour=13, minute=31)
+        market_close = time(hour=13, minute=40)
         return 0 <= today_weekday <= 4 and market_open <= now_hour_min <= market_close
 
     def update_table_content(self):

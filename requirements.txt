@@ -1,4 +1,2 @@
-twstock
-lxml
 PyQt6
 requests
