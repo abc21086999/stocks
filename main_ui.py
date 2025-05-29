@@ -35,7 +35,7 @@ class StockUI(QWidget):
 
         # --- 顯示股票的table ---
         self.threadpool = QThreadPool()
-        self.stock_table = StockTable(self.setting_manager, self.threadpool, self.add_stocks.stock_deleted)
+        self.stock_table = StockTable(self.setting_manager, self.threadpool, self.add_stocks.stock_changed)
         self.lower_box.addWidget(self.stock_table)
 
         # --- 在開盤時更新股票資訊內容 ---

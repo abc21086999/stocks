@@ -1,5 +1,6 @@
 from PyQt6.QtWidgets import QLabel, QLineEdit, QPushButton, QWidget, QHBoxLayout
 from PyQt6.QtCore import pyqtSlot, pyqtSignal
+import re
 
 
 def create_header():
@@ -10,13 +11,14 @@ def create_header():
 
 
 class AddStocks(QWidget):
-    stock_deleted = pyqtSignal()
+    stock_changed = pyqtSignal()
 
     def __init__(self, setting_manager):
         super().__init__()
         # --- 儲存股票 ---
         self.setting_manager = setting_manager
         self.stock_list = self.setting_manager.load_stock_id()
+        self._pattern = re.compile(r'^\d{4,6}(?:[A-Z]+(?:\d+)?)?$')
 
         self.input_line = QLineEdit()
         self.add_button = QPushButton()
@@ -37,23 +39,27 @@ class AddStocks(QWidget):
         # --- 設置布局管理器 ---
         self.setLayout(self.hbox_layout)
 
+    def is_valid_stock_id(self, stock_id: str) -> bool:
+        return bool(self._pattern.match(stock_id))
+
     @pyqtSlot()
     def add_new_stocks(self):
         stock_id = self.input_line.text().strip()
-        if stock_id.isnumeric() and stock_id not in self.stock_list:
+        if self.is_valid_stock_id(stock_id) and stock_id not in self.stock_list:
             self.stock_list.append(stock_id)
             self.setting_manager.save_stock_id(self.stock_list)
             self.input_line.clear()
+            self.stock_deleted.emit()
         else:
             return None
 
     @pyqtSlot()
     def delete_stocks(self):
         stock_id = self.input_line.text().strip()
-        if stock_id.isnumeric() and stock_id in self.stock_list:
+        if stock_id in self.stock_list:
             self.stock_list.remove(stock_id)
             self.setting_manager.save_stock_id(self.stock_list)
             self.input_line.clear()
-            self.stock_deleted.emit()
+            self.stock_changed.emit()
         else:
             return None
