@@ -49,7 +49,7 @@ class AddStocks(QWidget):
             self.stock_list.append(stock_id)
             self.setting_manager.save_stock_id(self.stock_list)
             self.input_line.clear()
-            self.stock_deleted.emit()
+            self.stock_changed.emit()
         else:
             return None
 
