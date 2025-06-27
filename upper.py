@@ -18,7 +18,7 @@ class AddStocks(QWidget):
         # --- 儲存股票 ---
         self.setting_manager = setting_manager
         self.stock_list = self.setting_manager.load_stock_id()
-        self._pattern = re.compile(r'^\d{4,6}(?:[A-Z]+(?:\d+)?)?$')
+        self._pattern = re.compile(r'^\d{4,6}(?:[A-Za-z]+(?:\d+)?)?$')
 
         self.input_line = QLineEdit()
         self.add_button = QPushButton()
@@ -44,7 +44,7 @@ class AddStocks(QWidget):
 
     @pyqtSlot()
     def add_new_stocks(self):
-        stock_id = self.input_line.text().strip()
+        stock_id = self.input_line.text().strip().upper()
         if self.is_valid_stock_id(stock_id) and stock_id not in self.stock_list:
             self.stock_list.append(stock_id)
             self.setting_manager.save_stock_id(self.stock_list)
