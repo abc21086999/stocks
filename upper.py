@@ -55,7 +55,7 @@ class AddStocks(QWidget):
 
     @pyqtSlot()
     def delete_stocks(self):
-        stock_id = self.input_line.text().strip()
+        stock_id = self.input_line.text().upper().strip()
         if stock_id in self.stock_list:
             self.stock_list.remove(stock_id)
             self.setting_manager.save_stock_id(self.stock_list)
