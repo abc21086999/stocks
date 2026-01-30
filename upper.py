@@ -11,7 +11,8 @@ def create_header():
 
 
 class AddStocks(QWidget):
-    stock_changed = pyqtSignal()
+    stock_added = pyqtSignal(str)
+    stock_removed = pyqtSignal(str)
 
     def __init__(self, setting_manager):
         super().__init__()
@@ -49,7 +50,7 @@ class AddStocks(QWidget):
             self.stock_list.append(stock_id)
             self.setting_manager.save_stock_id(self.stock_list)
             self.input_line.clear()
-            self.stock_changed.emit()
+            self.stock_added.emit(stock_id)
         else:
             return None
 
@@ -60,6 +61,6 @@ class AddStocks(QWidget):
             self.stock_list.remove(stock_id)
             self.setting_manager.save_stock_id(self.stock_list)
             self.input_line.clear()
-            self.stock_changed.emit()
+            self.stock_removed.emit(stock_id)
         else:
             return None
