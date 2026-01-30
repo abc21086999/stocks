@@ -1,7 +1,7 @@
 from PySide6.QtGui import QPalette
 from PySide6.QtCore import Signal, Slot, QTimer
 from PySide6.QtWidgets import QGridLayout, QWidget, QLabel, QApplication
-from data import *
+from .data import *
 from datetime import datetime, time
 
 

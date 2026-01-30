@@ -1,9 +1,9 @@
 from PySide6.QtWidgets import QApplication, QVBoxLayout, QWidget
 from PySide6.QtCore import Qt, QTimer, QThreadPool
 import sys
-from upper import *
-from lower import *
-from app_settings import *
+from .upper import *
+from .lower import *
+from .app_settings import *
 from datetime import datetime, time
 
 
