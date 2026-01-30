@@ -1,12 +1,12 @@
-from PyQt6.QtGui import QPalette
-from PyQt6.QtCore import pyqtSignal, pyqtSlot, QTimer
-from PyQt6.QtWidgets import QGridLayout, QWidget, QLabel, QApplication
+from PySide6.QtGui import QPalette
+from PySide6.QtCore import Signal, Slot, QTimer
+from PySide6.QtWidgets import QGridLayout, QWidget, QLabel, QApplication
 from data import *
 from datetime import datetime, time
 
 
 class StockTable(QWidget):
-    data_signal = pyqtSignal(list)
+    data_signal = Signal(list)
 
     def __init__(self, setting_manager, thread_pool):
         super().__init__()
@@ -102,7 +102,7 @@ class StockTable(QWidget):
         else:
             pass
 
-    @pyqtSlot(str)
+    @Slot(str)
     def add_stock(self, stock_id):
         """
         新增股票：加入順序清單，並啟動該股票的抓取線程。
@@ -111,7 +111,7 @@ class StockTable(QWidget):
             self.stock_order.append(stock_id)
             self.thread_pool.start(FetchStockData(stock_id, self.data_signal))
 
-    @pyqtSlot(str)
+    @Slot(str)
     def remove_stock(self, stock_id):
         """
         刪除股票：移除 UI 元件，更新內部資料，並將下方列往上移。

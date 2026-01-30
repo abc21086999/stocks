@@ -1,5 +1,5 @@
-from PyQt6.QtWidgets import QApplication, QVBoxLayout
-from PyQt6.QtCore import Qt, QTimer, QThreadPool
+from PySide6.QtWidgets import QApplication, QVBoxLayout, QWidget
+from PySide6.QtCore import Qt, QTimer, QThreadPool
 import sys
 from upper import *
 from lower import *

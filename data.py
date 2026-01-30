@@ -3,7 +3,7 @@ import time
 import requests
 import urllib.parse
 from datetime import datetime
-from PyQt6.QtCore import pyqtSlot, QRunnable
+from PySide6.QtCore import Slot, QRunnable
 
 
 class FetchStockData(QRunnable):

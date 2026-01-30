@@ -1,5 +1,5 @@
-from PyQt6.QtWidgets import QLabel, QLineEdit, QPushButton, QWidget, QHBoxLayout
-from PyQt6.QtCore import pyqtSlot, pyqtSignal
+from PySide6.QtWidgets import QLabel, QLineEdit, QPushButton, QWidget, QHBoxLayout
+from PySide6.QtCore import Slot, Signal
 import re
 
 
@@ -11,8 +11,8 @@ def create_header():
 
 
 class AddStocks(QWidget):
-    stock_added = pyqtSignal(str)
-    stock_removed = pyqtSignal(str)
+    stock_added = Signal(str)
+    stock_removed = Signal(str)
 
     def __init__(self, setting_manager):
         super().__init__()
@@ -43,7 +43,7 @@ class AddStocks(QWidget):
     def is_valid_stock_id(self, stock_id: str) -> bool:
         return bool(self._pattern.match(stock_id))
 
-    @pyqtSlot()
+    @Slot()
     def add_new_stocks(self):
         stock_id = self.input_line.text().strip().upper()
         if self.is_valid_stock_id(stock_id) and stock_id not in self.stock_list:
@@ -54,7 +54,7 @@ class AddStocks(QWidget):
         else:
             return None
 
-    @pyqtSlot()
+    @Slot()
     def delete_stocks(self):
         stock_id = self.input_line.text().upper().strip()
         if stock_id in self.stock_list:
