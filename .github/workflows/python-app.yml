@@ -37,7 +37,7 @@ jobs:
 
       - name: Build with Nuitka
         run: |
-          python3 -m nuitka --standalone --onefile --disable-console --macos-create-app-bundle --enable-plugin=pyside6 --windows-icon-from-ico=icon.ico --macos-app-icon=icon.png --include-data-files=icon.ico=icon.ico --include-data-files=icon.png=icon.png --assume-yes-for-downloads main.py
+          python3 -m nuitka --standalone --onefile --windows-console-mode=disable --macos-create-app-bundle --enable-plugin=pyside6 --windows-icon-from-ico=icon.ico --macos-app-icon=icon.png --include-data-files=icon.ico=icon.ico --include-data-files=icon.png=icon.png --assume-yes-for-downloads main.py
 
       - name: Create Release and Upload
         uses: softprops/action-gh-release@v2
@@ -47,6 +47,6 @@ jobs:
           # 指定要上傳的副檔名 (Windows 是 .exe，Mac 沒副檔名或 .app)
           files: |
             main.exe
-            main
+            main.app
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
