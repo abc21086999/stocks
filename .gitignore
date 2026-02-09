@@ -3,3 +3,4 @@ __pycache__/
 main_ui.dist/
 main_ui.exe
 venv/
+build/
