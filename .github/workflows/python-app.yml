@@ -44,6 +44,7 @@ jobs:
             --macos-app-icon=icon.png \
             --include-data-files=icon.png=icon.png \
             --include-data-files=icon.ico=icon.ico \
+            --enable-plugin=pyside6 \
             main.py
 
       - name: Create Release and Upload
