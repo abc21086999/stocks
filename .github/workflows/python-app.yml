@@ -37,16 +37,58 @@ jobs:
 
       - name: Build with Nuitka
         run: |
-          python3 -m nuitka --standalone --onefile --windows-console-mode=disable --macos-create-app-bundle --enable-plugin=pyside6 --windows-icon-from-ico=icon.ico --macos-app-icon=icon.png --include-data-files=icon.ico=icon.ico --include-data-files=icon.png=icon.png --assume-yes-for-downloads main.py
+          nuitka --standalone --onefile --windows-console-mode=disable --enable-plugin=pyside6 --nofollow-import-to=PySide6.QtWebEngine,PySide6.QtWebEngineCore,PySide6.QtWebEngineWidgets,PySide6.QtQml,PySide6.QtQuick,PySide6.QtQuickWidgets,PySide6.QtQuickControls2,PySide6.QtMultimedia,PySide6.QtMultimediaWidgets,PySide6.QtNetwork,PySide6.QtWebSockets,PySide6.QtWebChannel,PySide6.QtSql,PySide6.QtSerialPort,PySide6.QtBluetooth,PySide6.QtNfc,PySide6.QtSensors,PySide6.QtPositioning,PySide6.QtLocation,PySide6.QtCharts,PySide6.QtDataVisualization,PySide6.Qt3DCore,PySide6.Qt3DInput,PySide6.Qt3DLogic,PySide6.Qt3DRender,PySide6.QtDesigner,PySide6.QtHelp,PySide6.QtTest,PySide6.QtXml,PySide6.QtRemoteObjects,PySide6.QtScxml,PySide6.QtStateMachine,PySide6.QtPrintSupport,PySide6.QtSvg --windows-icon-from-ico=icon.ico --include-data-files=icon.ico=icon.ico --assume-yes-for-downloads --output-dir=build main.py
+
+      - name: Prepare Windows Artifact
+        if: runner.os == 'Windows'
+        shell: bash
+        run: |
+          # Nuitka 在 Windows --onefile 會產生 main.exe
+          if [ -f "build/main.exe" ]; then
+            mv build/main.exe ./main.exe
+            echo "Successfully moved main.exe to root."
+          else
+            echo "Error: build/main.exe not found!"
+            ls -R build
+            exit 1
+          fi
+
+      # --- 針對 macOS 的處理：壓縮 ---
+      - name: Prepare macOS Artifact (Zip)
+        if: runner.os == 'macOS'
+        shell: bash
+        run: |
+          # Nuitka 在 macOS --onefile 通常會產生 main.bin 或 main (無副檔名)
+          # 為了保險起見，我們檢查這兩種情況
+          
+          OUTPUT_BIN=""
+          if [ -f "build/main.bin" ]; then
+            OUTPUT_BIN="build/main.bin"
+          elif [ -f "build/main" ]; then
+            OUTPUT_BIN="build/main"
+          fi
+          
+          if [ -n "$OUTPUT_BIN" ]; then
+            echo "Found binary at $OUTPUT_BIN, compressing..."
+            # 使用 zip -j 不包含目錄結構，只壓縮檔案
+            zip -j main_mac.zip "$OUTPUT_BIN"
+          else
+            echo "Error: macOS binary not found in build directory!"
+            ls -R build
+            exit 1
+          fi
 
       - name: Create Release and Upload
         uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
         with:
           tag_name: ${{ github.event.inputs.tag_name }}
           name: Release ${{ github.event.inputs.tag_name }}
-          # 指定要上傳的副檔名 (Windows 是 .exe，Mac 沒副檔名或 .app)
+          # 這裡列出可能的檔案，GitHub Action 會自動忽略不存在的那個
+          # Windows 會上傳 main.exe
+          # macOS 會上傳 main_mac.zip
           files: |
             main.exe
-            main.app
+            main_mac.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
