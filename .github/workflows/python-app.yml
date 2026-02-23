@@ -41,16 +41,16 @@ jobs:
 
       - name: Prepare Windows Artifact
         if: runner.os == 'Windows'
-        shell: bash
+        shell: pwsh
         run: |
-          if [ -d "build/main.dist" ]; then
-            cd build && zip -r ../stocks_windows.zip main.dist
-            echo "Successfully zipped main.dist to stocks_windows.zip"
-          else
-            echo "Error: build/main.dist not found!"
-            ls -R build
+          if (Test-Path "build/main.dist") {
+            Compress-Archive -Path "build/main.dist" -DestinationPath "stocks_windows.zip" -Force
+            Write-Host "Successfully zipped main.dist to stocks_windows.zip"
+          } else {
+            Write-Error "Error: build/main.dist not found!"
+            Get-ChildItem -Path build -Recurse
             exit 1
-          fi
+          }
 
       # --- 針對 macOS 的處理：壓縮 ---
       - name: Prepare macOS Artifact (Zip)
@@ -72,9 +72,7 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.tag_name }}
           name: Release ${{ github.event.inputs.tag_name }}
-          # 這裡列出壓縮後的檔案
-          files: |
-            stocks_windows.zip
-            stocks_macos.zip
+          # 這裡使用萬用字元，確保只上傳當前平台產出的檔案
+          files: stocks_*.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
