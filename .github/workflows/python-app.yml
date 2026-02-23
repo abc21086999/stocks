@@ -37,18 +37,17 @@ jobs:
 
       - name: Build with Nuitka
         run: |
-          nuitka --standalone --onefile --windows-console-mode=disable --enable-plugin=pyside6 --nofollow-import-to=PySide6.QtWebEngine,PySide6.QtWebEngineCore,PySide6.QtWebEngineWidgets,PySide6.QtQml,PySide6.QtQuick,PySide6.QtQuickWidgets,PySide6.QtQuickControls2,PySide6.QtMultimedia,PySide6.QtMultimediaWidgets,PySide6.QtNetwork,PySide6.QtWebSockets,PySide6.QtWebChannel,PySide6.QtSql,PySide6.QtSerialPort,PySide6.QtBluetooth,PySide6.QtNfc,PySide6.QtSensors,PySide6.QtPositioning,PySide6.QtLocation,PySide6.QtCharts,PySide6.QtDataVisualization,PySide6.Qt3DCore,PySide6.Qt3DInput,PySide6.Qt3DLogic,PySide6.Qt3DRender,PySide6.QtDesigner,PySide6.QtHelp,PySide6.QtTest,PySide6.QtXml,PySide6.QtRemoteObjects,PySide6.QtScxml,PySide6.QtStateMachine,PySide6.QtPrintSupport,PySide6.QtSvg --windows-icon-from-ico=icon.ico --include-data-files=icon.ico=icon.ico --assume-yes-for-downloads --output-dir=build main.py
+          nuitka --standalone --windows-console-mode=disable --enable-plugin=pyside6 --nofollow-import-to=PySide6.QtWebEngine,PySide6.QtWebEngineCore,PySide6.QtWebEngineWidgets,PySide6.QtQml,PySide6.QtQuick,PySide6.QtQuickWidgets,PySide6.QtQuickControls2,PySide6.QtMultimedia,PySide6.QtMultimediaWidgets,PySide6.QtNetwork,PySide6.QtWebSockets,PySide6.QtWebChannel,PySide6.QtSql,PySide6.QtSerialPort,PySide6.QtBluetooth,PySide6.QtNfc,PySide6.QtSensors,PySide6.QtPositioning,PySide6.QtLocation,PySide6.QtCharts,PySide6.QtDataVisualization,PySide6.Qt3DCore,PySide6.Qt3DInput,PySide6.Qt3DLogic,PySide6.Qt3DRender,PySide6.QtDesigner,PySide6.QtHelp,PySide6.QtTest,PySide6.QtXml,PySide6.QtRemoteObjects,PySide6.QtScxml,PySide6.QtStateMachine,PySide6.QtPrintSupport,PySide6.QtSvg --windows-icon-from-ico=icon.ico --include-data-files=icon.ico=icon.ico --assume-yes-for-downloads --output-dir=build main.py
 
       - name: Prepare Windows Artifact
         if: runner.os == 'Windows'
         shell: bash
         run: |
-          # Nuitka 在 Windows --onefile 會產生 main.exe
-          if [ -f "build/main.exe" ]; then
-            mv build/main.exe ./main.exe
-            echo "Successfully moved main.exe to root."
+          if [ -d "build/main.dist" ]; then
+            cd build && zip -r ../stocks_windows.zip main.dist
+            echo "Successfully zipped main.dist to stocks_windows.zip"
           else
-            echo "Error: build/main.exe not found!"
+            echo "Error: build/main.dist not found!"
             ls -R build
             exit 1
           fi
@@ -58,22 +57,11 @@ jobs:
         if: runner.os == 'macOS'
         shell: bash
         run: |
-          # Nuitka 在 macOS --onefile 通常會產生 main.bin 或 main (無副檔名)
-          # 為了保險起見，我們檢查這兩種情況
-          
-          OUTPUT_BIN=""
-          if [ -f "build/main.bin" ]; then
-            OUTPUT_BIN="build/main.bin"
-          elif [ -f "build/main" ]; then
-            OUTPUT_BIN="build/main"
-          fi
-          
-          if [ -n "$OUTPUT_BIN" ]; then
-            echo "Found binary at $OUTPUT_BIN, compressing..."
-            # 使用 zip -j 不包含目錄結構，只壓縮檔案
-            zip -j main_mac.zip "$OUTPUT_BIN"
+          if [ -d "build/main.dist" ]; then
+            cd build && zip -r ../stocks_macos.zip main.dist
+            echo "Successfully zipped main.dist to stocks_macos.zip"
           else
-            echo "Error: macOS binary not found in build directory!"
+            echo "Error: build/main.dist not found!"
             ls -R build
             exit 1
           fi
@@ -84,11 +72,9 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.tag_name }}
           name: Release ${{ github.event.inputs.tag_name }}
-          # 這裡列出可能的檔案，GitHub Action 會自動忽略不存在的那個
-          # Windows 會上傳 main.exe
-          # macOS 會上傳 main_mac.zip
+          # 這裡列出壓縮後的檔案
           files: |
-            main.exe
-            main_mac.zip
+            stocks_windows.zip
+            stocks_macos.zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
