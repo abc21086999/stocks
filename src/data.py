@@ -1,9 +1,7 @@
-import time
-
 import requests
-import urllib.parse
 from datetime import datetime
-from PySide6.QtCore import Slot, QRunnable
+from PySide6.QtCore import QRunnable
+from urllib.parse import urlencode
 
 
 class FetchStockData(QRunnable):
@@ -21,7 +19,7 @@ class FetchStockData(QRunnable):
 
             # 分成兩組參數：分號參數 和 & 參數
             semicolon_params = {
-                "autoRefresh": int(datetime.now().timestamp()),
+                "autoRefresh": int(datetime.now().timestamp() * 1000),
                 "fields": "avgPrice,orderbook",
                 "symbols": stock_symbol,
             }
@@ -35,7 +33,7 @@ class FetchStockData(QRunnable):
                 "region": "TW",
                 "site": "finance",
                 "tz": "Asia/Taipei",
-                "returnMeta": "true"
+                "returnMeta": "true",
             }
 
             # 組建分號分隔的字串
@@ -45,12 +43,17 @@ class FetchStockData(QRunnable):
             semicolon_string = ";".join(semicolon_string_parts)
 
             # 組建 & 分隔的 query string (使用 urllib.parse.urlencode)
-            ampersand_query_string = urllib.parse.urlencode(ampersand_params)
+            ampersand_query_string = urlencode(ampersand_params)
 
             # 組合完整的 URL
             full_url = f"{base_url}{api_endpoint};{semicolon_string}?{ampersand_query_string}"
 
-            resp = requests.get(full_url)
+            header = {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36",
+                "Referer": f"https://tw.stock.yahoo.com/quote/{self.stock_id}.TW"
+            }
+
+            resp = requests.get(url=full_url, headers=header)
             resp.raise_for_status()
 
             resp_json = resp.json()
@@ -71,7 +74,7 @@ class FetchStockData(QRunnable):
 
             return [self.stock_id, symbol_name, latest_price, percentage, day_high, day_low, open_price, volume]
         except Exception as e:
-            # print(f'Exception: {e}')
+            print(f'Exception: {e}')
             return [self.stock_id, "-", "-", "-", "-", "-", "-", "-", ]
 
     def run(self):
