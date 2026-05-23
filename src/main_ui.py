@@ -21,13 +21,8 @@ class StockUI(QWidget):
         self.upper_box = QVBoxLayout()
 
         # --- 添加股票的輸入視窗和點擊按鈕 ---
-        self.top_label = create_header()
-        self.upper_box.addWidget(self.top_label)
         self.add_stocks = AddStocks(self.setting_manager)
         self.upper_box.addWidget(self.add_stocks)
-
-        # 設置Header的對齊位置
-        self.upper_box.setAlignment(self.top_label, Qt.AlignmentFlag.AlignHCenter | Qt.AlignmentFlag.AlignTop)
 
 
         # --- Lower Box ---
