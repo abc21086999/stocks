@@ -1,7 +1,6 @@
 from PySide6.QtGui import QPalette
 from PySide6.QtCore import Signal, Slot, QTimer
 from PySide6.QtWidgets import QGridLayout, QWidget, QLabel, QApplication
-from nuitka.utils.Images import convertImageToIconFormat
 
 from .data import *
 from datetime import datetime, time
