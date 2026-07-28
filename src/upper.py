@@ -1,6 +1,7 @@
 from PySide6.QtWidgets import QLabel, QLineEdit, QPushButton, QWidget, QHBoxLayout
 from PySide6.QtCore import Slot, Signal
 import re
+from .settings_dialog import SettingsDialog
 
 
 def create_header():
@@ -13,6 +14,7 @@ def create_header():
 class AddStocks(QWidget):
     stock_added = Signal(str)
     stock_removed = Signal(str)
+    settings_changed = Signal()
 
     def __init__(self, setting_manager):
         super().__init__()
@@ -26,19 +28,34 @@ class AddStocks(QWidget):
         self.add_button.setText("添加股票")
         self.delete_button = QPushButton()
         self.delete_button.setText("刪除股票")
+        self.settings_button = QPushButton()
+        self.settings_button.setText("⚙️")
 
         # --- 填入東西並且點擊的行為 ---
         self.add_button.clicked.connect(self.add_new_stocks)
         self.delete_button.clicked.connect(self.delete_stocks)
+        self.settings_button.clicked.connect(self.open_settings)
 
         # --- 水平的布局管理器 ---
         self.hbox_layout = QHBoxLayout()
         self.hbox_layout.addWidget(self.input_line)
         self.hbox_layout.addWidget(self.add_button)
         self.hbox_layout.addWidget(self.delete_button)
+        self.hbox_layout.addWidget(self.settings_button)
 
         # --- 設置布局管理器 ---
         self.setLayout(self.hbox_layout)
+
+    @Slot()
+    def open_settings(self):
+        dialog = SettingsDialog(self.setting_manager, self)
+        dialog.settings_changed.connect(self.on_settings_changed)
+        dialog.exec()
+
+    @Slot()
+    def on_settings_changed(self):
+        self.stock_list = self.setting_manager.load_stock_id()
+        self.settings_changed.emit()
 
     def is_valid_stock_id(self, stock_id: str) -> bool:
         return bool(self._pattern.match(stock_id))

@@ -33,6 +33,7 @@ class StockUI(QWidget):
         self.stock_table = StockTable(self.setting_manager, self.threadpool)
         self.add_stocks.stock_added.connect(self.stock_table.add_stock)
         self.add_stocks.stock_removed.connect(self.stock_table.remove_stock)
+        self.add_stocks.settings_changed.connect(self.stock_table.reload_table)
         self.lower_box.addWidget(self.stock_table)
 
         # --- 在開盤時更新股票資訊內容 ---

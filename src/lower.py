@@ -1,6 +1,8 @@
 from PySide6.QtGui import QPalette
 from PySide6.QtCore import Signal, Slot, QTimer
 from PySide6.QtWidgets import QGridLayout, QWidget, QLabel, QApplication
+from nuitka.utils.Images import convertImageToIconFormat
+
 from .data import *
 from datetime import datetime, time
 
@@ -35,9 +37,15 @@ class StockTable(QWidget):
         default_text_color = default_palette.color(QPalette.ColorRole.Text)
         default_color_name = default_text_color.name()
 
+        if not self.setting_manager.load_enable_price_color():
+            return default_color_name
+
         try:
-            percentage_value = float(percentage.strip("%"))
-        except ValueError:
+            if isinstance(percentage, float):
+                percentage_value = percentage
+            elif isinstance(percentage, str):
+                percentage_value = float(percentage.strip("%"))
+        except (ValueError, TypeError):
             return default_color_name
 
         if percentage_value < 0:
@@ -93,6 +101,16 @@ class StockTable(QWidget):
         if stored_stock_id:
             for stock_id in stored_stock_id:
                 self.thread_pool.start(FetchStockData(stock_id, self.data_signal))
+
+    @Slot()
+    def reload_table(self):
+        for stock_id, widgets in list(self.stock_data_widgets.items()):
+            for widget in widgets.values():
+                self.stock_table.removeWidget(widget)
+                widget.deleteLater()
+        self.stock_data_widgets.clear()
+        self.stock_order.clear()
+        self.update_table_content()
 
     def decide_update(self):
         if self.is_market_open():
