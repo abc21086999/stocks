@@ -1,7 +1,6 @@
 from PySide6.QtGui import QPalette
 from PySide6.QtCore import Signal, Slot, QTimer
 from PySide6.QtWidgets import QGridLayout, QWidget, QLabel, QApplication
-
 from .data import *
 from datetime import datetime, time
 
@@ -17,7 +16,7 @@ class StockTable(QWidget):
         self.data_signal.connect(self.handle_stock_data)
 
         self.stock_table = QGridLayout()
-        self.headers = ["股票代號", "股票名稱", "現價", "漲跌幅", "盤中最高", "盤中最低", "開盤價", "成交量"]
+        self.headers = ["股票代號", "股票名稱", "現價", "漲跌幅", "盤中最高", "盤中最低", "開盤價", "成交量", "成交金額（億）"]
         self.create_table_header()
         self.stock_data_widgets = {}
         self.stock_order = []
@@ -40,10 +39,7 @@ class StockTable(QWidget):
             return default_color_name
 
         try:
-            if isinstance(percentage, float):
-                percentage_value = percentage
-            elif isinstance(percentage, str):
-                percentage_value = float(percentage.strip("%"))
+            percentage_value = float(percentage.strip("%"))
         except (ValueError, TypeError):
             return default_color_name
 

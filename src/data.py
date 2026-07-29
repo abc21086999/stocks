@@ -19,6 +19,12 @@ class StockFetcher:
         else:
             return self._fetch_stock(stock_id)
 
+    def turnover_calculator(self, raw_turnover):
+        if raw_turnover >= 100:
+            return round(raw_turnover / 100, 2)
+        else:
+            return round(raw_turnover / 100, 3)
+
     def _fetch_index(self, stock_id):
         try:
             base_url = "https://tw.stock.yahoo.com"
@@ -67,7 +73,7 @@ class StockFetcher:
             # 現在價格
             latest_price = resp_json.get("data")[0].get("chart").get("quote").get("price").get("sort")
             # 漲跌幅
-            percentage = resp_json.get("data")[0].get("chart").get("quote").get("changePercent").get("sort")
+            percentage = resp_json.get("data")[0].get("chart").get("quote").get("changePercent").get("fmt")
             # 今日最高
             day_high = resp_json.get("data")[0].get("chart").get("quote").get("dayHighPrice").get("sort")
             # 今日最低
@@ -76,11 +82,13 @@ class StockFetcher:
             volume = divmod(int(resp_json.get("data")[0].get("chart").get("quote").get("volume")), 1000)[0]
             # 開盤價格
             open_price = resp_json.get("data")[0].get("chart").get("quote").get("openPrice").get("sort")
+            # 成交金額
+            turnover = self.turnover_calculator(float(resp_json.get("data")[0].get("chart").get("quote").get("turnoverM")))
 
-            return [stock_id, symbol_name, latest_price, percentage, day_high, day_low, open_price, volume]
+            return [stock_id, symbol_name, latest_price, percentage, day_high, day_low, open_price, volume, turnover]
         except Exception as e:
             print(f'Exception: {e}')
-            return [stock_id, "-", "-", "-", "-", "-", "-", "-", ]
+            return [stock_id, "-", "-", "-", "-", "-", "-", "-", "-"]
 
     def _fetch_stock(self, stock_id):
         try:
@@ -138,11 +146,13 @@ class StockFetcher:
             volume = divmod(int(resp_json.get("data")[0].get("volume")), 1000)[0]
             # 開盤價格
             open_price = resp_json.get("data")[0].get("regularMarketOpen").get("raw")
+            # 成交金額
+            turnover = self.turnover_calculator(float(resp_json.get("data")[0].get("turnoverM")))
 
-            return [stock_id, symbol_name, latest_price, percentage, day_high, day_low, open_price, volume]
+            return [stock_id, symbol_name, latest_price, percentage, day_high, day_low, open_price, volume, turnover]
         except Exception as e:
             print(f'Exception: {e}')
-            return [stock_id, "-", "-", "-", "-", "-", "-", "-", ]
+            return [stock_id, "-", "-", "-", "-", "-", "-", "-", "-"]
 
 stock_fetcher = StockFetcher()
 
