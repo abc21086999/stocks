@@ -77,7 +77,7 @@ class StockTable(QWidget):
         else:
             # 更新現有股票
             for column, header in enumerate(self.headers):
-                if header != "股票代號" and header != "股票名稱":
+                if header != "股票代號":
                     self.stock_data_widgets[stock_id][header].setText(str(stock_data[column]) if column < len(stock_data) else "")
             self.stock_data_widgets[stock_id]["現價"].setStyleSheet(f"color:{self.stock_text_color(stock_price)};")
 
