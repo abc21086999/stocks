@@ -1,10 +1,9 @@
-from PySide6.QtWidgets import QApplication, QVBoxLayout, QWidget
-from PySide6.QtCore import Qt, QTimer, QThreadPool
+from PySide6.QtWidgets import QApplication, QVBoxLayout
+from PySide6.QtCore import QTimer, QThreadPool
 import sys
 from .upper import *
-from .lower import *
+from .stock_table import StockTable
 from .app_settings import *
-from datetime import datetime, time
 
 
 class StockUI(QWidget):
