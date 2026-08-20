@@ -1,14 +1,7 @@
-from PySide6.QtWidgets import QLabel, QLineEdit, QPushButton, QWidget, QHBoxLayout
+from PySide6.QtWidgets import QHBoxLayout, QLineEdit, QPushButton, QWidget
 from PySide6.QtCore import Slot, Signal
 import re
 from .settings_dialog import SettingsDialog
-
-
-def create_header():
-    header = QLabel()
-    header.setText("台股")
-    header.setStyleSheet("font-size:25px;")
-    return header
 
 
 class AddStocks(QWidget):
