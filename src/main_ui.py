@@ -38,7 +38,7 @@ class StockUI(QWidget):
         # --- 在開盤時更新股票資訊內容 ---
         self.timer = QTimer()
         self.timer.timeout.connect(self.stock_table.decide_update)
-        self.timer.start(30000)
+        self.timer.start(10000)
 
         # --- Main Layout ---
         self.main_layout = QVBoxLayout()  # 創建主佈局 (垂直排列)

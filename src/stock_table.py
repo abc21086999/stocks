@@ -1,7 +1,7 @@
 from datetime import datetime, time
 from PySide6.QtCore import QTimer, Qt, Signal, Slot
 from PySide6.QtWidgets import QAbstractItemView, QHeaderView, QSizePolicy, QTableView, QVBoxLayout, QWidget
-from .data import FetchStockData
+from .data import FetchBatchStockData, FetchStockData
 from .stock_table_model import StockTableModel
 
 
@@ -15,6 +15,8 @@ class StockTable(QWidget):
         self.thread_pool = thread_pool
         self._initial_size_adjusted = False
         self._initial_size_adjustment_pending = False
+        self._width_expansion_pending = False
+        self._height_adjustment_pending = False
         self._initial_pending_stock_ids = set()
         self.headers = ["股票代號", "股票名稱", "現價", "漲跌幅", "盤中最高", "盤中最低", "開盤價", "成交量", "成交金額（億）"]
 
@@ -75,8 +77,8 @@ class StockTable(QWidget):
             if not self._initial_pending_stock_ids:
                 self._fit_initial_window_size()
 
-        for stock_id in stored_stock_id:
-            self.thread_pool.start(FetchStockData(stock_id, self.data_signal))
+        if stored_stock_id:
+            self.thread_pool.start(FetchBatchStockData(stored_stock_id, self.data_signal))
 
     def _fit_initial_window_size(self):
         """Make the first window large enough for every table column and row once."""
@@ -149,6 +151,48 @@ class StockTable(QWidget):
         view.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
         view.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAsNeeded)
 
+    def _expand_window_width_if_needed(self):
+        """Expand the window width if the table columns grew wider than the viewport."""
+        self._width_expansion_pending = False
+        window = self.window()
+        if not window.isVisible():
+            return
+
+        view = self.table_view
+        required_width = sum(
+            view.columnWidth(column)
+            for column in range(self.model.columnCount())
+        )
+        width_delta = required_width - view.viewport().width()
+        if width_delta > 0:
+            window.resize(window.width() + width_delta, window.height())
+
+    def _adjust_window_height(self):
+        """Adjust the window height to fit the current row count."""
+        self._height_adjustment_pending = False
+        window = self.window()
+        if not window.isVisible():
+            return
+
+        view = self.table_view
+        target_viewport_height = sum(
+            view.rowHeight(row)
+            for row in range(self.model.rowCount())
+        ) or view.verticalHeader().defaultSectionSize()
+        height_delta = target_viewport_height - view.viewport().height()
+        if height_delta != 0:
+            window.resize(
+                window.width(),
+                max(window.minimumHeight(), window.height() + height_delta),
+            )
+
+    def _schedule_height_adjustment(self):
+        if not self._initial_size_adjusted:
+            return
+        if not self._height_adjustment_pending:
+            self._height_adjustment_pending = True
+            QTimer.singleShot(0, self._adjust_window_height)
+
     @Slot(list)
     def handle_stock_data(self, stock_data):
         self.model.update_stock_data(stock_data)
@@ -156,6 +200,10 @@ class StockTable(QWidget):
             self._initial_pending_stock_ids.discard(stock_data[0])
             if not self._initial_pending_stock_ids:
                 QTimer.singleShot(0, self._fit_initial_window_size)
+        elif self._initial_size_adjusted:
+            if not self._width_expansion_pending:
+                self._width_expansion_pending = True
+                QTimer.singleShot(0, self._expand_window_width_if_needed)
 
     def is_market_open(self) -> bool:
         today_weekday = datetime.today().weekday()
@@ -167,19 +215,22 @@ class StockTable(QWidget):
     @Slot()
     def reload_table(self):
         self.update_table_content()
+        self._schedule_height_adjustment()
 
     def decide_update(self):
         if not self.is_market_open():
             return
 
-        for stock_id in self.model.stock_order:
-            self.thread_pool.start(FetchStockData(stock_id, self.data_signal))
+        if self.model.stock_order:
+            self.thread_pool.start(FetchBatchStockData(self.model.stock_order, self.data_signal))
 
     @Slot(str)
     def add_stock(self, stock_id):
         self.model.add_stock(stock_id)
+        self._schedule_height_adjustment()
         self.thread_pool.start(FetchStockData(stock_id, self.data_signal))
 
     @Slot(str)
     def remove_stock(self, stock_id):
         self.model.remove_stock(stock_id)
+        self._schedule_height_adjustment()

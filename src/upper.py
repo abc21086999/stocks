@@ -32,6 +32,7 @@ class AddStocks(QWidget):
         self.settings_button.setText("⚙️")
 
         # --- 填入東西並且點擊的行為 ---
+        self.input_line.returnPressed.connect(self.add_new_stocks)
         self.add_button.clicked.connect(self.add_new_stocks)
         self.delete_button.clicked.connect(self.delete_stocks)
         self.settings_button.clicked.connect(self.open_settings)
