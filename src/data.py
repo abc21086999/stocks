@@ -72,6 +72,8 @@ class StockFetcher:
             symbol_name = resp_json.get("data")[0].get("chart").get("meta").get("name")
             # 現在價格
             latest_price = resp_json.get("data")[0].get("chart").get("quote").get("price").get("sort")
+            # 漲跌
+            change = resp_json.get("data")[0].get("chart").get("quote").get("change", {}).get("raw", "-")
             # 漲跌幅
             percentage = resp_json.get("data")[0].get("chart").get("quote").get("changePercent").get("fmt")
             # 今日最高
@@ -85,15 +87,16 @@ class StockFetcher:
             # 成交金額
             turnover = self.turnover_calculator(float(resp_json.get("data")[0].get("chart").get("quote").get("turnoverM")))
 
-            return [stock_id, symbol_name, latest_price, percentage, day_high, day_low, open_price, volume, turnover]
+            return [stock_id, symbol_name, latest_price, change, percentage, day_high, day_low, open_price, volume, turnover]
         except Exception as e:
             print(f'Exception: {e}')
-            return [stock_id, "-", "-", "-", "-", "-", "-", "-", "-"]
+            return [stock_id, "-", "-", "-", "-", "-", "-", "-", "-", "-"]
 
     def _parse_stock_item(self, stock_id: str, item: dict):
         try:
             symbol_name = item.get("symbolName")
             latest_price = item.get("price", {}).get("raw", "-")
+            change = item.get("change", {}).get("raw", "-")
             percentage = item.get("changePercent", "-")
             day_high = item.get("regularMarketDayHigh", {}).get("raw", "-")
             day_low = item.get("regularMarketDayLow", {}).get("raw", "-")
@@ -102,10 +105,10 @@ class StockFetcher:
             open_price = item.get("regularMarketOpen", {}).get("raw", "-")
             raw_turnover = item.get("turnoverM")
             turnover = self.turnover_calculator(float(raw_turnover)) if raw_turnover is not None else "-"
-            return [stock_id, symbol_name, latest_price, percentage, day_high, day_low, open_price, volume, turnover]
+            return [stock_id, symbol_name, latest_price, change, percentage, day_high, day_low, open_price, volume, turnover]
         except Exception as e:
             print(f'Exception parsing stock {stock_id}: {e}')
-            return [stock_id, "-", "-", "-", "-", "-", "-", "-", "-"]
+            return [stock_id, "-", "-", "-", "-", "-", "-", "-", "-", "-"]
 
     def _fetch_stock(self, stock_id):
         try:
@@ -152,10 +155,10 @@ class StockFetcher:
             data_items = resp_json.get("data", [])
             if data_items:
                 return self._parse_stock_item(stock_id, data_items[0])
-            return [stock_id, "-", "-", "-", "-", "-", "-", "-", "-"]
+            return [stock_id, "-", "-", "-", "-", "-", "-", "-", "-", "-"]
         except Exception as e:
             print(f'Exception: {e}')
-            return [stock_id, "-", "-", "-", "-", "-", "-", "-", "-"]
+            return [stock_id, "-", "-", "-", "-", "-", "-", "-", "-", "-"]
 
     def _fetch_batch_stocks(self, stock_ids: list[str]):
         try:
@@ -203,12 +206,12 @@ class StockFetcher:
                 if stock_id in data_by_symbol:
                     batch_results.append(self._parse_stock_item(stock_id, data_by_symbol[stock_id]))
                 else:
-                    batch_results.append([stock_id, "-", "-", "-", "-", "-", "-", "-", "-"])
+                    batch_results.append([stock_id, "-", "-", "-", "-", "-", "-", "-", "-", "-"])
 
             return batch_results
         except Exception as e:
             print(f'Exception in _fetch_batch_stocks: {e}')
-            return [[stock_id, "-", "-", "-", "-", "-", "-", "-", "-"] for stock_id in stock_ids]
+            return [[stock_id, "-", "-", "-", "-", "-", "-", "-", "-", "-"] for stock_id in stock_ids]
 
     def fetch_batch(self, stock_ids: list[str]):
         if not stock_ids:

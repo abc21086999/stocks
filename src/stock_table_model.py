@@ -6,7 +6,8 @@ class StockTableModel(QAbstractTableModel):
     """Owns stock table data and tells Qt exactly which cells need repainting."""
 
     PRICE_COLUMN = 2
-    PERCENTAGE_COLUMN = 3
+    CHANGE_COLUMN = 3
+    PERCENTAGE_COLUMN = 4
 
     def __init__(self, headers, price_color_enabled=True, parent=None):
         super().__init__(parent)

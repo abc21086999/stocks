@@ -18,7 +18,7 @@ class StockTable(QWidget):
         self._width_expansion_pending = False
         self._height_adjustment_pending = False
         self._initial_pending_stock_ids = set()
-        self.headers = ["股票代號", "股票名稱", "現價", "漲跌幅", "盤中最高", "盤中最低", "開盤價", "成交量", "成交金額（億）"]
+        self.headers = ["股票代號", "股票名稱", "現價", "漲跌", "漲跌幅", "盤中最高", "盤中最低", "開盤價", "成交量", "成交金額（億）"]
 
         self.model = StockTableModel(
             self.headers,

@@ -99,11 +99,11 @@ load_enable_price_color() -> bool
 
 `fetch_batch(stock_ids)` batches regular stock queries into a single comma-separated `StockServices.stockList` request while querying any index symbols individually.
 
-Both methods return 9-element list(s):
+Both methods return 10-element list(s):
 
 ```python
-[stock_id, name, price, change_pct, day_high, day_low, open_price, volume, turnover]
-#    0       1      2       3           4         5         6          7       8
+[stock_id, name, price, change, change_pct, day_high, day_low, open_price, volume, turnover]
+#    0       1      2       3        4          5         6         7          8       9
 ```
 
 On any exception, a placeholder list is returned with `"-"` for all fields except `stock_id`. The app never crashes on network failure.
@@ -146,12 +146,13 @@ StockUI (QVBoxLayout)
 | 0 | 股票代號 | Symbol |
 | 1 | 股票名稱 | Name |
 | 2 | 現價 | Price — colored if enabled |
-| 3 | 漲跌幅 | Change % — used to derive color |
-| 4 | 盤中最高 | Day high |
-| 5 | 盤中最低 | Day low |
-| 6 | 開盤價 | Open |
-| 7 | 成交量 | Volume (lots) |
-| 8 | 成交金額（億） | Turnover (hundred million TWD) |
+| 3 | 漲跌 | Change points |
+| 4 | 漲跌幅 | Change % — used to derive color |
+| 5 | 盤中最高 | Day high |
+| 6 | 盤中最低 | Day low |
+| 7 | 開盤價 | Open |
+| 8 | 成交量 | Volume (lots) |
+| 9 | 成交金額（億） | Turnover (hundred million TWD) |
 
 **Initial window auto-sizing** runs in three deferred steps (each via `QTimer.singleShot(0, ...)`):
 1. `_fit_initial_window_size()` — calls `resizeColumnsToContents()`
